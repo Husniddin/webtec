@@ -1,0 +1,21 @@
+import socket
+import threading
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind(('0.0.0.0', 2222))
+s.listen(10)
+
+def server(conn, addr):
+	while True:
+		data = conn.recv(1024)
+		if not data: break
+		if data.decode('utf-8') == 'close':
+			conn.close()
+			break
+		conn.send(data)
+	conn.close()
+
+while True:
+	conn, addr = s.accept()
+	t = threading.Thread(target=server, args=(conn, addr))
+	t.start()
